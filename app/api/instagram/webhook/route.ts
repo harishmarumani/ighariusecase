@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const VERIFY_TOKEN = "ighariusecase_webhook_2026_9Kx7Pq4Lm8Vn2";
+const VERIFY_TOKEN = process.env.INSTAGRAM_VERIFY_TOKEN;
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
