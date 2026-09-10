@@ -19,10 +19,33 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-console.log(
-  "Instagram webhook:",
-  JSON.stringify(body, null, 2)
-);
+  console.log(
+    "INSTAGRAM WEBHOOK FULL:",
+    JSON.stringify(body, null, 2)
+  );
+
+  const messaging = body?.entry?.[0]?.messaging?.[0];
+
+  if (messaging?.sender?.id) {
+    console.log(
+      "INSTAGRAM SENDER IGSID:",
+      messaging.sender.id
+    );
+  }
+
+  if (messaging?.recipient?.id) {
+    console.log(
+      "INSTAGRAM RECIPIENT IGSID:",
+      messaging.recipient.id
+    );
+  }
+
+  if (messaging?.message?.text) {
+    console.log(
+      "INSTAGRAM MESSAGE:",
+      messaging.message.text
+    );
+  }
 
   return NextResponse.json({ received: true });
 }
