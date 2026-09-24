@@ -1,23 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
-/**
- * Shared Webhook Endpoint
- *
- * Instagram:
- *   INSTAGRAM_VERIFY_TOKEN
- *
- * Messenger:
- *   MESSENGER_VERIFY_TOKEN
- *
- * Endpoint:
- *   /api/instagram/webhook
- */
-
 /* =========================================================
    GET — Instagram + Messenger Webhook Verification
    ========================================================= */
 
-export async function GET(request) {
+export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
 
   const mode = searchParams.get("hub.mode");
@@ -28,23 +15,40 @@ export async function GET(request) {
   const messengerToken = process.env.MESSENGER_VERIFY_TOKEN;
 
   const isInstagramToken =
-    token && instagramToken && token === instagramToken;
+    !!token &&
+    !!instagramToken &&
+    token === instagramToken;
 
   const isMessengerToken =
-    token && messengerToken && token === messengerToken;
+    !!token &&
+    !!messengerToken &&
+    token === messengerToken;
 
-  const isValidToken = isInstagramToken || isMessengerToken;
+  const isValidToken =
+    isInstagramToken || isMessengerToken;
 
   console.log("=================================");
   console.log("WEBHOOK VERIFICATION");
   console.log("=================================");
   console.log("Mode:", mode);
   console.log("Token received:", !!token);
-  console.log("Instagram token exists:", !!instagramToken);
-  console.log("Messenger token exists:", !!messengerToken);
-  console.log("Instagram token matched:", !!isInstagramToken);
-  console.log("Messenger token matched:", !!isMessengerToken);
-  console.log("Token valid:", !!isValidToken);
+  console.log(
+    "Instagram token exists:",
+    !!instagramToken
+  );
+  console.log(
+    "Messenger token exists:",
+    !!messengerToken
+  );
+  console.log(
+    "Instagram token matched:",
+    isInstagramToken
+  );
+  console.log(
+    "Messenger token matched:",
+    isMessengerToken
+  );
+  console.log("Token valid:", isValidToken);
   console.log("Challenge:", challenge);
   console.log("=================================");
 
@@ -67,7 +71,7 @@ export async function GET(request) {
    POST — Instagram + Messenger Webhook Events
    ========================================================= */
 
-export async function POST(request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
@@ -85,7 +89,7 @@ export async function POST(request) {
     console.log("Webhook Object:", objectType);
 
     /* =====================================================
-       MESSENGER WEBHOOK
+       MESSENGER
        ===================================================== */
 
     if (objectType === "page") {
@@ -96,7 +100,8 @@ export async function POST(request) {
       const entries = body?.entry || [];
 
       for (const entry of entries) {
-        const messagingEvents = entry?.messaging || [];
+        const messagingEvents =
+          entry?.messaging || [];
 
         for (const messaging of messagingEvents) {
           const senderId = messaging?.sender?.id;
@@ -124,8 +129,6 @@ export async function POST(request) {
             );
           }
 
-          /* Quick Reply */
-
           const quickReplyPayload =
             messaging?.message?.quick_reply?.payload;
 
@@ -136,8 +139,6 @@ export async function POST(request) {
             );
           }
 
-          /* Postback */
-
           const postbackPayload =
             messaging?.postback?.payload;
 
@@ -147,8 +148,6 @@ export async function POST(request) {
               postbackPayload
             );
           }
-
-          /* Attachments */
 
           const attachments =
             messaging?.message?.attachments;
@@ -164,8 +163,6 @@ export async function POST(request) {
             );
           }
 
-          /* Sender Action */
-
           if (messaging?.sender_action) {
             console.log(
               "MESSENGER SENDER ACTION:",
@@ -180,7 +177,7 @@ export async function POST(request) {
 
 
     /* =====================================================
-       INSTAGRAM WEBHOOK
+       INSTAGRAM
        ===================================================== */
 
     else if (objectType === "instagram") {
@@ -237,7 +234,7 @@ export async function POST(request) {
 
 
     /* =====================================================
-       UNKNOWN WEBHOOK
+       UNKNOWN
        ===================================================== */
 
     else {
